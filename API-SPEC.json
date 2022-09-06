@@ -1,0 +1,288 @@
+{
+    "openapi":"3.0.2",
+    "info": {
+      "title":"Point Of Sales",
+      "version":"1.0"
+    },
+    "servers": [
+      {"url":"http://127.0.0.1:3001/api/v1"}
+    ],
+    "paths": {
+        "/login":{
+            "post":{
+                "tags": ["Login API"],
+                "description": "Login User",
+                "summary": "Login User",
+                "parameters": [],
+                "requestBody":{
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "type": "object",
+                                "properties": {
+                                    "user_name":{
+                                        "type": "string",
+                                        "description": "user name dari user"
+                                    },
+                                    "password":{
+                                        "type": "string",
+                                        "description": "password dari user"
+                                    }
+                                },"required": ["user_name","password"]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200":{
+                        "description": "Success Login",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type": "object",
+                                    "properties": {
+                                        "status_code":{
+                                            "type":"integer",
+                                            "format": "number"
+                                        },
+                                        "method":{
+                                            "type": "string"
+                                        },
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": ["status_code","method","message"]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/register":{
+            "post":{
+                "tags": ["Register API"],
+                "description": "Register User",
+                "summary": "Register User",
+                "parameters": [],
+                "requestBody":{
+                    "content": {
+                        "application/x-www-form-urlencoded":{
+                            "schema":{
+                                "type": "object",
+                                "properties": {
+                                    "user_name":{
+                                        "type": "string",
+                                        "description": "user name dari user"
+                                    },
+                                    "password":{
+                                        "type": "string",
+                                        "description": "password dari user"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/customer": {
+            "get": {
+              "security": [{
+                "CategoryAuth":[]
+              }],
+              "tags": ["Customer API"],
+              "description": "List all Customers",
+              "summary": "List All Customers",
+              "parameters": [],
+              "responses": {
+                "200": {
+                  "description": "Success get all Customers",
+                  "content": {
+                    "application/json":{
+                      "schema":{
+                        "type": "object",
+                        "properties": {
+                          "code":{
+                            "type": "number"
+                          },
+                          "status":{
+                            "type": "string"
+                          },
+                          "data":{
+                            "type": "array",
+                            "items":{
+                                "Category":{
+                                    "type": "object",
+                                    "properties": {
+                                      "id":{
+                                        "type": "number"
+                                      },
+                                      "name":{
+                                        "type": "string"
+                                      }
+                                    }
+                                  }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+        },
+        "products":{
+          "post":{
+            "security": [{
+              "CategoryAuth":[]
+            }],
+            "tags": ["Products API"],
+            "description": "Create Product",
+            "summary": "Create Product",
+            "parameters": [],
+            "requestBody":{
+              "content": {
+                  "application/json":{
+                      "schema":{
+                          "type": "object",
+                          "properties": {
+                              "name":{
+                                  "type": "string",
+                                  "description": "Nama Product"
+                              },
+                              "price":{
+                                  "type": "number",
+                                  "description": "Harga Product"
+                              },
+                              "quantity":{
+                                "type": "integer",
+                                "description": "quantity product"
+                              },
+                              "description":{
+                                "type": "string",
+                                "description": "deskripsi product"
+                              }
+                          },"required": ["name","price","qty"]
+                      }
+                  }
+              }
+          },
+            "responses": {
+              "200": {
+                "description": "Success Create Product",
+                "content": {
+                  "application/json":{
+                    "schema":{
+                      "type": "object",
+                      "properties": {
+                        "code":{
+                          "type": "number"
+                        },
+                        "status":{
+                          "type": "string"
+                        },
+                        "data":{
+                          "type": "array",
+                          "items":{
+                              "Category":{
+                                  "type": "object",
+                                  "properties": {
+                                    "id":{
+                                      "type": "number"
+                                    },
+                                    "name":{
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }            
+          },
+          "get": {
+            "security": [{
+              "bearerAuth":[]
+            }],
+            "tags": ["Products API"],
+            "description": "List all products",
+            "summary": "List All products",
+            "parameters": [],
+            "responses": {
+              "200": {
+                "description": "Success get all products",
+                "content": {
+                  "application/json":{
+                    "schema":{
+                      "type": "object",
+                      "properties": {
+                        "code":{
+                          "type": "number"
+                        },
+                        "status":{
+                          "type": "string"
+                        },
+                        "data":{
+                          "type": "array",
+                          "items":{
+                              "Category":{
+                                  "type": "object",
+                                  "properties": {
+                                    "id":{
+                                      "type": "number"
+                                    },
+                                    "name":{
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+    },
+    "components": {
+      "securitySchemes": {
+        "bearerAuth":{
+          "type":"apiKey",
+          "in":"header",
+          "name":"Bearer-KEY",
+          "description":"Authentication for API"
+        }
+      },
+      "schemas": {
+        "CreateOrUpdateCategory":{
+          "type": "object",
+          "properties": {
+            "name":{
+              "type": "string"
+            }
+          }
+        },
+        "Category":{
+          "type": "object",
+          "properties": {
+            "id":{
+              "type": "number"
+            },
+            "name":{
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
