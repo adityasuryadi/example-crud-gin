@@ -58,7 +58,6 @@ func (controller *UserController) Login(ctx *gin.Context) {
 
 	loginResponse.UserName = user.UserName
 	loginResponse.AccessToken = accesToken
-
 	response := helpers.WebResponse{
 		Code:    200,
 		Status:  "success",

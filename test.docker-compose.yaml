@@ -1,0 +1,37 @@
+version: "3.8"
+networks:
+  integration-tests:
+    driver: bridge
+services:
+  pos_mysql_test:
+    image: mysql:5.7 
+    container_name: pos_mysql_test
+    command: mysqld --user=root
+    ports:
+      - 3306:3306
+    networks:
+      - integration-tests
+    environment:
+      - MYSQL_DATABASE=inventory
+      # - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=root
+    volumes: 
+        - ./docker/test-mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "--password=root" ,"ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
+  api_test:
+    build:
+      context: .
+      dockerfile: ./test.Dockerfile
+    volumes:
+      - ./app:/app
+    environment: 
+      - MYSQL_TEST_URL=root:root@tcp(pos_mysql_test:3306)/inventory?parseTime=1&loc=Asia%2FJakarta&charset=utf8mb4&collation=utf8mb4_unicode_ci
+    networks:
+      - integration-tests
+    depends_on:
+      pos_mysql_test:
+        condition: service_healthy

@@ -21,4 +21,5 @@ func InitCustomerRoute(db *gorm.DB, route *gin.Engine) {
 	groupRoute.POST("/customer", customerController.CreateCustomer)
 	groupRoute.PUT("/customer/:id", customerController.EditCustomer)
 	groupRoute.DELETE("/customer/:id", customerController.DeleteCustomer)
+	groupRoute.GET("customer/log/test", customerController.TestLog)
 }

@@ -1,7 +1,6 @@
 package configs
 
 import (
-	"app/entity"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -28,16 +27,16 @@ func InitDB() *gorm.DB {
 		panic(err)
 	}
 
-	migrateDDL(db)
+	// migrateDDL(db)
 
 	return db
 }
 
-func migrateDDL(db *gorm.DB) {
-	// migrasi domain ke tabel di mysql
+// func migrateDDL(db *gorm.DB) {
+// 	// migrasi domain ke tabel di mysql
 
-	db.AutoMigrate(&entity.Customer{})
-}
+// 	db.AutoMigrate(&entity.Customer{})
+// }
 
 func processENV() {
 

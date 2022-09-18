@@ -11,6 +11,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	log "github.com/sirupsen/logrus"
 )
 
 type CustomerController struct {
@@ -40,7 +41,7 @@ func (controller *CustomerController) GetCustomer(ctx *gin.Context) {
 	response := helpers.WebResponse{
 		Code:    200,
 		Status:  "success",
-		Message: "Sccess",
+		Message: "Success",
 		Data:    customer,
 	}
 	ctx.JSON(http.StatusOK, response)
@@ -68,8 +69,6 @@ func (controller *CustomerController) CreateCustomer(ctx *gin.Context) {
 func (controller *CustomerController) EditCustomer(ctx *gin.Context) {
 	var request models.CreateCustomerRequest
 	customerId, _ := strconv.Atoi(ctx.Param("id"))
-	// ctx.ShouldBind(&request) //handle json
-	// // ctx.PostForm("name") //handle form
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		var ve validator.ValidationErrors
 		if errors.As(err, &ve) {
@@ -87,4 +86,10 @@ func (controller *CustomerController) EditCustomer(ctx *gin.Context) {
 func (controller *CustomerController) DeleteCustomer(ctx *gin.Context) {
 	customerId, _ := strconv.Atoi(ctx.Param("id"))
 	controller.CustomerService.DeleteCustomer(int64(customerId))
+}
+
+// untuk belajar log
+func (controller *CustomerController) TestLog(ctx *gin.Context) {
+	responses := controller.CustomerService.ListCustomers()
+	log.Error(responses)
 }
