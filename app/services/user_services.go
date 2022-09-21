@@ -7,5 +7,5 @@ import (
 
 type UserService interface {
 	CreateUser(request *models.RequestCreateUser)
-	LoginUser(request *models.RequestLoginUser) (*entity.User, error)
+	LoginUser(request *models.RequestLoginUser) (*entity.User, string)
 }

@@ -44,21 +44,24 @@ func (repository *UserRepositoryImpl) Create(request models.RequestCreateUser) {
 }
 
 // Login implements UserRepository
-func (repository *UserRepositoryImpl) Login(request models.RequestLoginUser) (*entity.User, error) {
+func (repository *UserRepositoryImpl) Login(request models.RequestLoginUser) (*entity.User, string) {
 	var user entity.User
+	var errorCode = make(chan string, 1)
 	db := repository.db.Model(&user)
-	// checkUserAccount := db.Debug().Select("*").Where("user_name = ?", request.UserName).Find(&user)
+	// db.Select("*").Where("user_name = ?", request.UserName).Find(&user)
 	checkUserAccount := db.Where("user_name = ? ", request.UserName).First(&user)
-
 	if checkUserAccount.RowsAffected < 1 {
-		return nil, gorm.ErrRecordNotFound
+		errorCode <- "LOGIN_NOT_FOUND_404"
+		return &user, <-errorCode
 	}
 
 	comparePassword := util.ComparePassword(user.Password, request.Password)
 	if comparePassword != nil {
-		return nil, comparePassword
+		errorCode <- "LOGIN_WRONG_PASSWORD_403"
+		return &user, <-errorCode
+	} else {
+		errorCode <- "nil"
 	}
-
-	return &user, nil
+	return &user, <-errorCode
 
 }

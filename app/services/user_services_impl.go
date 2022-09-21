@@ -29,12 +29,7 @@ func (service *UserServiceImpl) CreateUser(request *models.RequestCreateUser) {
 	service.UserRepository.Create(*request)
 }
 
-func (service *UserServiceImpl) LoginUser(request *models.RequestLoginUser) (*entity.User, error) {
-	err := service.Validate.Struct(request)
-	if err != nil {
-		return &entity.User{}, err
-	}
-	result, err := service.UserRepository.Login(*request)
-
-	return result, err
+func (service *UserServiceImpl) LoginUser(request *models.RequestLoginUser) (*entity.User, string) {
+	result, errorCode := service.UserRepository.Login(*request)
+	return result, errorCode
 }

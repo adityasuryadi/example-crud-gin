@@ -11,6 +11,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/sirupsen/logrus"
 )
 
 type UserController struct {
@@ -28,14 +29,14 @@ func (controller *UserController) CreateUser(ctx *gin.Context) {
 }
 
 func (controller *UserController) Login(ctx *gin.Context) {
+	var validate *validator.Validate
 	var request models.RequestLoginUser
-
+	var ve validator.ValidationErrors
+	validate = validator.New()
 	ctx.ShouldBindJSON(&request)
 
-	var ve validator.ValidationErrors
+	err := validate.Struct(request)
 	var loginResponse models.ResponseLoginUser
-	user, err := controller.UserService.LoginUser(&request)
-
 	if err != nil {
 		if errors.As(err, &ve) {
 			out := make([]helpers.ErrorMessage, len(ve))
@@ -53,17 +54,25 @@ func (controller *UserController) Login(ctx *gin.Context) {
 		return
 	}
 
-	accessTokenData := map[string]interface{}{"user_name": user.UserName, "password": user.Password}
-	accesToken, _ := util.Sign(accessTokenData, os.Getenv("JWT_SECRET"), 24*60*1)
+	user, errorCode := controller.UserService.LoginUser(&request)
+	logrus.Info(errorCode)
+	switch errorCode {
+	case "LOGIN_NOT_FOUND_404":
+		// ctx.JSON(http.StatusNotFound, nil)
+		helpers.APIResponse(ctx, "user acount is not registered", http.StatusNotFound, http.MethodPost, nil)
+		return
+	case "LOGIN_WRONG_PASSWORD_403":
+		// ctx.JSON(http.StatusForbidden, nil)
+		helpers.APIResponse(ctx, "user or password wrong", http.StatusForbidden, http.MethodPost, nil)
+		return
+	default:
+		accessTokenData := map[string]interface{}{"user_name": user.UserName, "password": user.Password}
+		accesToken, _ := util.Sign(accessTokenData, os.Getenv("JWT_SECRET"), 24*60*1)
 
-	loginResponse.UserName = user.UserName
-	loginResponse.AccessToken = accesToken
-	response := helpers.WebResponse{
-		Code:    200,
-		Status:  "success",
-		Message: "Success",
-		Data:    loginResponse,
+		loginResponse.UserName = user.UserName
+		loginResponse.AccessToken = accesToken
+		helpers.APIResponse(ctx, "Login Success", http.StatusOK, http.MethodPost, loginResponse)
+		return
 	}
-	ctx.JSON(http.StatusOK, response)
 
 }

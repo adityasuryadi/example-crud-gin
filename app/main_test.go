@@ -104,9 +104,70 @@ func TestSuccessLogin(t *testing.T) {
 
 	assert.Equal(t, w.Code, 200)
 	assert.Equal(t, http.MethodPost, req.Method)
+	assert.Equal(t, res["message"], "Login Success")
 	assert.Equal(t, parse["user_name"], "adit")
 
 	accessToken = parse["access_token"].(string)
+}
+
+func TestLoginUserNotFound(t *testing.T) {
+	payload := gin.H{
+		"user_name": "adit1234",
+		"password":  "qwertyu",
+	}
+
+	// encode payload atau ubah raw string ke json
+	encoded, err := json.Marshal(payload)
+	if err != nil {
+		t.FailNow()
+	}
+
+	// record
+	recorder := httptest.NewRecorder()
+	req, err := http.NewRequest(http.MethodPost, "/api/v1/login", bytes.NewBuffer(encoded))
+	req.Header.Set("Content-Type", "application/json")
+
+	if err != nil {
+		t.FailNow()
+	}
+
+	router.ServeHTTP(recorder, req)
+	response := make(map[string]interface{})
+	json.NewDecoder(recorder.Body).Decode(&response)
+
+	assert.Equal(t, recorder.Code, 404)
+	assert.Equal(t, http.MethodPost, req.Method)
+	assert.Equal(t, response["data"], nil)
+	assert.Equal(t, response["message"], "user acount is not registered")
+}
+
+func TestLoginWrongPassword(t *testing.T) {
+	payload := gin.H{
+		"user_name": "adit",
+		"password":  "aditya",
+	}
+
+	encoded, err := json.Marshal(payload)
+	if err != nil {
+		t.FailNow()
+	}
+
+	// record
+	recorder := httptest.NewRecorder()
+	req, err := http.NewRequest(http.MethodPost, "/api/v1/login", bytes.NewBuffer(encoded))
+	req.Header.Set("Content-type", "application/json")
+	if err != nil {
+		t.FailNow()
+	}
+
+	router.ServeHTTP(recorder, req)
+	response := make(map[string]interface{})
+	json.NewDecoder(recorder.Body).Decode(&response)
+
+	assert.Equal(t, recorder.Code, 403)
+	assert.Equal(t, http.MethodPost, req.Method)
+	assert.Equal(t, response["data"], nil)
+	assert.Equal(t, response["message"], "user or password wrong")
 }
 
 func TestSuccessGetCustomerById(t *testing.T) {
